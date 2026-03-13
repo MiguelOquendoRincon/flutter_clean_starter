@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter_clean_starter/features/user_auth/data/models/user_model.dart';
 import 'package:flutter_clean_starter/features/user_auth/domain/entities/user_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
