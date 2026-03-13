@@ -11,7 +11,13 @@ import 'package:mocktail/mocktail.dart';
 
 class MockLoginUseCase extends Mock implements LoginUseCase {}
 
+class FakeLoginParams extends Fake implements LoginParams {}
+
 void main() {
+  setUpAll(() {
+    registerFallbackValue(FakeLoginParams());
+  });
+
   late AuthBloc bloc;
   late MockLoginUseCase mockLoginUseCase;
 
