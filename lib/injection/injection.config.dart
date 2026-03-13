@@ -14,6 +14,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i558;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
+import '../core/network/auth_interceptor.dart' as _i552;
 import '../core/network/dio_client.dart' as _i393;
 import '../features/user_auth/data/datasources/auth_local_data_source.dart'
     as _i635;
@@ -34,15 +35,20 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
-    final networkModule = _$NetworkModule();
     final storageModule = _$StorageModule();
-    gh.lazySingleton<_i361.Dio>(() => networkModule.dio);
+    final networkModule = _$NetworkModule();
     gh.lazySingleton<_i558.FlutterSecureStorage>(() => storageModule.storage);
     gh.lazySingleton<_i635.AuthLocalDataSource>(
       () => _i635.AuthLocalDataSourceImpl(gh<_i558.FlutterSecureStorage>()),
     );
     gh.lazySingleton<_i188.AuthRemoteDataSource>(
       () => _i188.AuthRemoteDataSourceImpl(),
+    );
+    gh.factory<_i552.AuthInterceptor>(
+      () => _i552.AuthInterceptor(gh<_i635.AuthLocalDataSource>()),
+    );
+    gh.lazySingleton<_i361.Dio>(
+      () => networkModule.dio(gh<_i552.AuthInterceptor>()),
     );
     gh.lazySingleton<_i425.AuthRepository>(
       () => _i925.AuthRepositoryImpl(gh<_i188.AuthRemoteDataSource>()),
@@ -55,6 +61,6 @@ extension GetItInjectableX on _i174.GetIt {
   }
 }
 
-class _$NetworkModule extends _i393.NetworkModule {}
-
 class _$StorageModule extends _i371.StorageModule {}
+
+class _$NetworkModule extends _i393.NetworkModule {}
