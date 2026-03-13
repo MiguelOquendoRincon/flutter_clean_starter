@@ -4,27 +4,40 @@ import '../../domain/usecases/login_usecase.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
-@injectable // Importante para que get_it pueda proveer el bloc
+@injectable
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase _loginUseCase;
 
   AuthBloc(this._loginUseCase) : super(const AuthState.initial()) {
-    on<_LoginRequested>(_onLoginRequested);
+    // CAMBIO AQUÍ: Usamos la clase pública AuthEvent y filtramos por el método map de Freezed
+    // o simplemente usamos la referencia correcta si no es privada.
+    on<AuthEvent>((event, emit) async {
+      await event.when(
+        loginRequested: (email, password) =>
+            _onLoginRequested(email, password, emit),
+        logoutRequested: () => _onLogoutRequested(emit),
+      );
+    });
   }
 
   Future<void> _onLoginRequested(
-    _LoginRequested event,
+    String email,
+    String password,
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthState.loading());
 
     final result = await _loginUseCase(
-      LoginParams(email: event.email, password: event.password),
+      LoginParams(email: email, password: password),
     );
 
     result.fold(
       (failure) => emit(AuthState.error(failure.message)),
       (user) => emit(AuthState.authenticated(user)),
     );
+  }
+
+  Future<void> _onLogoutRequested(Emitter<AuthState> emit) async {
+    // Implementación de logout si fuera necesaria
   }
 }

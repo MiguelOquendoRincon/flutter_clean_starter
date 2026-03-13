@@ -19,6 +19,7 @@ import '../features/user_auth/data/repositories/auth_repository_impl.dart'
 import '../features/user_auth/domain/repositories/auth_repository.dart'
     as _i425;
 import '../features/user_auth/domain/usecases/login_usecase.dart' as _i838;
+import '../features/user_auth/presentation/bloc/auth_bloc.dart' as _i596;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -36,6 +37,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i838.LoginUseCase>(
       () => _i838.LoginUseCase(gh<_i425.AuthRepository>()),
     );
+    gh.factory<_i596.AuthBloc>(() => _i596.AuthBloc(gh<_i838.LoginUseCase>()));
     return this;
   }
 }
